@@ -24,7 +24,7 @@ fn main() {
     let files_and_directories = filesystem::list_files_and_directories(current_dir_path);
 
 
-    current_directory_files.push(filesystem::build_file_dir_info(1, "/home/user/".to_string(), "test.txt".to_string(), 1, 10, 12345678));
+    current_directory_files.push(filesystem::build_file_dir_info(1, "/home/user/".to_string(), "test.txt".to_string(), filesystem::TYPE_FILE.to_string(), 10, 12345678));
     println!("\n\nFiles and Directories ->");
 
     let filedirinfo: Option<&filesystem::FileDirInfo> = current_directory_files.get(0);
