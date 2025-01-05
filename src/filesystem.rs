@@ -1,6 +1,11 @@
 use std::env;
 use std::fs;
 
+
+pub const TYPE_FILE:&str = "file";
+pub const TYPE_DIR:&str = "dir";
+pub const TYPE_UNKNOWN:&str = "Unknown";
+
 pub struct FileDirInfo {
     pub index: u16,
     pub base_path: String,
@@ -25,17 +30,25 @@ pub fn get_current_path() -> String {
     }
 }
 
-pub fn list_files_and_directories(required_path: String) -> Result<()>{
+pub fn list_files_and_directories(required_path: String) {
     
-    let paths = fs::read_dir(required_path).unwrap();
-    match paths {
-        Ok(paths) => paths,
-        Err(_) => "FAILED".to_string(),
-    };
+    let cur_dir = fs::read_dir(required_path).unwrap();
 
-   // for each_path in paths {
-   //     println!("-> {}", each_path.unwrap().path().display());
-   // }
+    for each_path in cur_dir {
+        let full_path: String = each_path.unwrap().path().display().to_string();
+        let metadata = fs::metadata(full_path.clone()).unwrap();
+        let mut file_type:&str = TYPE_UNKNOWN;
+
+        if metadata.file_type().is_dir(){
+
+            file_type = TYPE_DIR;
+        } else {
+        
+            file_type = TYPE_FILE;
+        }
+
+        println!("-> Path: {}, Type: {}", full_path, file_type);
+    }
 }
 
 pub fn build_file_dir_info(index: u16, base_path: String, name: String, file_dir_type: u8, size_in_bytes: u128, last_modified: u128) -> FileDirInfo {
