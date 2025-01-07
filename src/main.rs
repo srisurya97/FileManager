@@ -7,8 +7,6 @@ mod version;
 
 fn main() {
 
-    let mut current_directory_files: Vec<filesystem::FileDirInfo> = Vec::new();
-
     let app_info = version::APP_INFO;
     println!("\n\n{} Ver {} {}", app_info.0, app_info.1, app_info.2);
     
@@ -23,14 +21,13 @@ fn main() {
     
     let files_and_directories = filesystem::list_files_and_directories(current_dir_path);
 
-
-    current_directory_files.push(filesystem::build_file_dir_info(1, "/home/user/".to_string(), "test.txt".to_string(), filesystem::TYPE_FILE.to_string(), 10, 12345678));
     println!("\n\nFiles and Directories ->");
 
-    let filedirinfo: Option<&filesystem::FileDirInfo> = current_directory_files.get(0);
-    match filedirinfo {
-        Some(filedirinfo) => cli::display_files_and_directories(filedirinfo),
-        None => println!("No File or Directory to Display"),
+    for each in files_and_directories {
+    
+        let filedirinfo: filesystem::FileDirInfo = each;
+        cli::display_files_and_directories(&filedirinfo)
+    
     }
 
     println!("\n");

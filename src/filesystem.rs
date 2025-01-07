@@ -2,7 +2,6 @@ use std::env;
 use std::fs;
 use std::time::UNIX_EPOCH;
 
-
 pub const TYPE_FILE:&str = "file";
 pub const TYPE_DIR:&str = "dir";
 //pub const TYPE_UNKNOWN:&str = "Unknown";
@@ -31,15 +30,16 @@ pub fn get_current_path() -> String {
     }
 }
 
-pub fn list_files_and_directories(required_path: String) {
+pub fn list_files_and_directories(required_path: String) -> Vec<FileDirInfo>{
     
-    let base_path: String = required_path.clone(); 
+    let mut file_dir_list_struct: Vec<FileDirInfo> = Vec::new();
+
+    let base_path: String = required_path.clone();
     let cur_dir = fs::read_dir(required_path).unwrap();
     
     let mut index: u16 = 0;
 
     for each_path in cur_dir {
-        index = index + 1;
         let full_path: String = each_path.unwrap().path().display().to_string();
         let metadata = fs::metadata(full_path.clone()).unwrap();
 
@@ -56,9 +56,24 @@ pub fn list_files_and_directories(required_path: String) {
         let file_dir_size = metadata.len();
         let last_modified = metadata.modified().unwrap().duration_since(UNIX_EPOCH).unwrap().as_secs();
 
-        println!("-> {} Path: {}, Name: {}, Type: {}, size: {}, Last Modified: {:?}", index, base_path, name, file_type, file_dir_size, last_modified);
-    
+        file_dir_list_struct.push(build_file_dir_info(index, base_path.clone(), name.to_string(), file_type.to_string(), file_dir_size.into(), last_modified.into()));
+        /*
+        println!("-> {} Path: {}, Name: {}, Type: {}, size: {}, Last Modified: {:?}", 
+                            file_dir_list_struct.index, 
+                            file_dir_list_struct.base_path, 
+                            file_dir_list_struct.name, 
+                            file_dir_list_struct.file_dir_type,
+                            file_dir_list_struct.size_in_bytes, 
+                            file_dir_list_struct.last_modified_time,
+                );
+        */
+        index = index + 1;
+
+
     }
+
+    return file_dir_list_struct;
+
 }
 
 
