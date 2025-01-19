@@ -35,6 +35,17 @@ pub fn display_files_and_directories(filedirinfo: &filesystem::FileDirInfo){
 
 }
 
+pub fn display_folder_content(){
+
+    let current_dir_path:String = filesystem::get_current_path();
+    let files_and_directories = filesystem::get_list_of_files_and_directories(current_dir_path);
+    for each in files_and_directories {
+        let filedirinfo: filesystem::FileDirInfo = each;
+        display_files_and_directories(&filedirinfo)
+    }
+
+}
+
 
 pub fn error_handle(_err: u8){
 }
@@ -53,6 +64,7 @@ pub fn process_cmd(cmd_to_process: String) -> u8 {
 
     match cmd_to_process.trim().as_ref() {
         ls_cmd=>{
+            display_folder_content();
         },
         clear_cmd=>{
         },

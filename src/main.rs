@@ -21,18 +21,6 @@ fn main() {
 
     cli::cli_run();
 
-    let current_dir_path:String = filesystem::get_current_path();
-    let files_and_directories = filesystem::get_list_of_files_and_directories(current_dir_path);
-
-
-    println!("\n\nFiles and Directories ->");
-    for each in files_and_directories {
-        let filedirinfo: filesystem::FileDirInfo = each;
-        cli::display_files_and_directories(&filedirinfo)
-    }
-
-    println!("\n");
-
 
 }
 
