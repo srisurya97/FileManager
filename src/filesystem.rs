@@ -30,7 +30,7 @@ pub fn get_current_path() -> String {
     }
 }
 
-pub fn list_files_and_directories(required_path: String) -> Vec<FileDirInfo>{
+pub fn get_list_of_files_and_directories(required_path: String) -> Vec<FileDirInfo>{
     
     let mut file_dir_list_struct: Vec<FileDirInfo> = Vec::new();
 
