@@ -1,10 +1,11 @@
 use std::io;
 use std::io::Write;
+use std::path::MAIN_SEPARATOR_STR;
 
 use crate::filesystem;
 use crate::errors;
 
-pub const SUPPORTED_COMMANDS: [&str; 4]  = [ "help", "exit", "clear", "ls" ]; //, "cd", "rm", "mv", "cp" ];
+pub const SUPPORTED_COMMANDS: [&str; 5]  = [ "help", "exit", "clear", "ls", "cd" ]; //, "cd", "rm", "mv", "cp" ];
 
 
 struct CLI_ {
@@ -35,38 +36,59 @@ pub fn display_files_and_directories(filedirinfo: &filesystem::FileDirInfo){
 
 }
 
-pub fn display_folder_content(cmd_: Vec<&str>){
+pub fn change_directory(cmd_: Vec<&str>) -> u8{
+
+        return errors::ERROR_SUCCESS;
+
+}
+
+pub fn display_folder_content(cmd_: Vec<&str>) -> u8{
     
     let mut dir_path: String = String::new();
 
-    if cmd_.len() == 1 {
+    if (cmd_.len() == 1) || ( (cmd_.len() == 2) && (cmd_[1].trim() == ".".to_string()) )  {
     
         dir_path = filesystem::get_current_path();
-        
-        println!("Current Path");
-    } else if cmd_.len() == 2 {
-        
-        if cmd_[1].trim() == ".".to_string(){
-
-            dir_path = filesystem::get_current_path();
-            println!("Current Folder: .");
-
-        } else {
-            // Possibilities
-            // /
-            // ..
-            // forward path
-
-            dir_path = filesystem::get_current_path();
-            println!("Path: {}", cmd_[1]);
+        let files_and_directories = filesystem::get_list_of_files_and_directories(dir_path);
+        for each in files_and_directories {
+            let filedirinfo: filesystem::FileDirInfo = each;
+            display_files_and_directories(&filedirinfo)
         }
 
-    }
+        return errors::ERROR_SUCCESS;
 
-    let files_and_directories = filesystem::get_list_of_files_and_directories(dir_path);
-    for each in files_and_directories {
-        let filedirinfo: filesystem::FileDirInfo = each;
-        display_files_and_directories(&filedirinfo)
+    } else {
+
+        pub const PATH_SEPARATOR: &str = MAIN_SEPARATOR_STR;
+        let path_ = cmd_[1]; //.clone();
+        let folder_path: Vec<&str> = path_.trim().split(PATH_SEPARATOR).collect();
+        println!("{:?} {:?}", folder_path, path_);
+        
+        if folder_path[0] == "" { 
+
+            let files_and_directories = filesystem::get_list_of_files_and_directories(path_.to_string());
+            for each in files_and_directories {
+                let filedirinfo: filesystem::FileDirInfo = each;
+                display_files_and_directories(&filedirinfo)
+            }
+        
+        } else {
+
+            dir_path = filesystem::get_current_path();
+            let mut final_path: String = dir_path.clone();
+            final_path.push_str(PATH_SEPARATOR);
+            final_path.push_str(path_);
+            println!("Path: {:?}", final_path);
+            let files_and_directories = filesystem::get_list_of_files_and_directories(final_path);
+            for each in files_and_directories {
+                let filedirinfo: filesystem::FileDirInfo = each;
+                display_files_and_directories(&filedirinfo)
+            }
+
+        }
+
+        return errors::ERROR_SUCCESS;
+
     }
 
 }
@@ -104,12 +126,16 @@ pub fn process_cmd(cmd_to_process_: String) -> u8 {
     const EXIT_CMD:&str = SUPPORTED_COMMANDS[1];
     const CLEAR_CMD:&str = SUPPORTED_COMMANDS[2];
     const LS_CMD:&str = SUPPORTED_COMMANDS[3];
+    const CD_CMD:&str = SUPPORTED_COMMANDS[4];
 
     let cmd_to_process: Vec<&str> = cmd_to_process_.split_whitespace().collect();
 
     match cmd_to_process[0].trim().as_ref() {
         LS_CMD=>{
-            display_folder_content(cmd_to_process);
+            return display_folder_content(cmd_to_process);
+        },
+        CD_CMD=>{
+            return change_directory(cmd_to_process);
         },
         CLEAR_CMD=>{
         },
@@ -122,7 +148,6 @@ pub fn process_cmd(cmd_to_process_: String) -> u8 {
             return errors::ERROR_UNSUPPORTED;
         },
     };
-
 
     return errors::ERROR_SUCCESS;
 }
