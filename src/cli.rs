@@ -1,6 +1,5 @@
 use std::io;
 use std::io::Write;
-use std::path::MAIN_SEPARATOR_STR;
 
 use crate::filesystem;
 use crate::errors;
@@ -59,14 +58,14 @@ pub fn display_folder_content(cmd_: Vec<&str>) -> u8{
 
     } else {
 
-        pub const PATH_SEPARATOR: &str = MAIN_SEPARATOR_STR;
-        let path_ = cmd_[1]; //.clone();
-        let folder_path: Vec<&str> = path_.trim().split(PATH_SEPARATOR).collect();
+        let path_separator: &str = filesystem::get_path_seperator();
+        let path_ = cmd_[1]; 
+        let folder_path: Vec<&str> = path_.trim().split(path_separator).collect();
         println!("{:?} {:?}", folder_path, path_);
         
         if folder_path[0] == "" { 
 
-            let files_and_directories = filesystem::get_list_of_files_and_directories(path_.to_string());
+            let files_and_directories = filesystem::get_list_of_files_and_directories(filesystem::get_path_seperator().to_string());
             for each in files_and_directories {
                 let filedirinfo: filesystem::FileDirInfo = each;
                 display_files_and_directories(&filedirinfo)
@@ -76,7 +75,7 @@ pub fn display_folder_content(cmd_: Vec<&str>) -> u8{
 
             dir_path = filesystem::get_current_path();
             let mut final_path: String = dir_path.clone();
-            final_path.push_str(PATH_SEPARATOR);
+            final_path.push_str(path_separator);
             final_path.push_str(path_);
             println!("Path: {:?}", final_path);
             let files_and_directories = filesystem::get_list_of_files_and_directories(final_path);

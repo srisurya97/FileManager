@@ -1,6 +1,8 @@
 use std::env;
 use std::fs;
 use std::time::UNIX_EPOCH;
+//use std::io::Write;
+use std::path::MAIN_SEPARATOR_STR;
 
 pub const TYPE_FILE:&str = "file";
 pub const TYPE_DIR:&str = "dir";
@@ -21,6 +23,11 @@ pub fn filesystem_init(){
 }
 
 
+pub fn get_path_seperator() -> &'static str{
+    return MAIN_SEPARATOR_STR;
+}
+
+
 pub fn get_current_path() -> String {
 
     let current_dir = env::current_dir();
@@ -33,7 +40,7 @@ pub fn get_current_path() -> String {
 pub fn get_list_of_files_and_directories(required_path: String) -> Vec<FileDirInfo>{
     
     let mut file_dir_list_struct: Vec<FileDirInfo> = Vec::new();
-
+    
     let base_path: String = required_path.clone();
     let cur_dir = fs::read_dir(required_path).unwrap();
     
@@ -47,6 +54,7 @@ pub fn get_list_of_files_and_directories(required_path: String) -> Vec<FileDirIn
         let name: &str = splited_path[splited_path.len() - 1];
         
         let file_type:&str;
+
         if metadata.file_type().is_dir(){
             file_type = TYPE_DIR;
         } else {
@@ -68,7 +76,6 @@ pub fn get_list_of_files_and_directories(required_path: String) -> Vec<FileDirIn
                 );
         */
         index = index + 1;
-
 
     }
 
