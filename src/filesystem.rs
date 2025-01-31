@@ -15,6 +15,8 @@ pub struct FileDirInfo {
     pub file_dir_type: String,
     pub size_in_bytes: u128,
     pub last_modified_time: u128,
+    pub is_symlink: bool,
+//    pub symlink_file_exists: bool,
 }
 
 
@@ -48,8 +50,15 @@ pub fn get_list_of_files_and_directories(required_path: String) -> Vec<FileDirIn
 
     for each_path in cur_dir {
         let full_path: String = each_path.unwrap().path().display().to_string();
-        let metadata = fs::metadata(full_path.clone()).unwrap();
 
+        let symlink_metadata = fs::symlink_metadata(full_path.clone()).unwrap();
+        let metadata = fs::metadata(full_path.clone()).unwrap();
+        
+        let mut is_symlink = false;
+        if symlink_metadata.file_type().is_symlink() {
+            is_symlink = true;
+        }
+        
         let splited_path: Vec<&str> = full_path.split("/").collect();
         let name: &str = splited_path[splited_path.len() - 1];
         
@@ -64,7 +73,7 @@ pub fn get_list_of_files_and_directories(required_path: String) -> Vec<FileDirIn
         let file_dir_size = metadata.len();
         let last_modified = metadata.modified().unwrap().duration_since(UNIX_EPOCH).unwrap().as_secs();
 
-        file_dir_list_struct.push(build_file_dir_info(index, base_path.clone(), name.to_string(), file_type.to_string(), file_dir_size.into(), last_modified.into()));
+        file_dir_list_struct.push(build_file_dir_info(index, base_path.clone(), name.to_string(), file_type.to_string(), is_symlink, file_dir_size.into(), last_modified.into()));
         /*
         println!("-> {} Path: {}, Name: {}, Type: {}, size: {}, Last Modified: {:?}", 
                             file_dir_list_struct.index, 
@@ -84,7 +93,7 @@ pub fn get_list_of_files_and_directories(required_path: String) -> Vec<FileDirIn
 }
 
 
-pub fn build_file_dir_info(index: u16, base_path: String, name: String, file_dir_type: String, size_in_bytes: u128, last_modified: u128) -> FileDirInfo {
+pub fn build_file_dir_info(index: u16, base_path: String, name: String, file_dir_type: String, is_symlink_: bool, size_in_bytes: u128, last_modified: u128) -> FileDirInfo {
     FileDirInfo {
         index : index,
         base_path : base_path.to_string(),
@@ -92,6 +101,7 @@ pub fn build_file_dir_info(index: u16, base_path: String, name: String, file_dir
         file_dir_type : file_dir_type,
         size_in_bytes : size_in_bytes,
         last_modified_time : last_modified,
+        is_symlink: is_symlink_,
     }
 }
 

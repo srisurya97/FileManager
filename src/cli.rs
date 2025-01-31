@@ -29,9 +29,9 @@ impl CLI_ {
 
 pub fn display_files_and_directories(filedirinfo: &filesystem::FileDirInfo){
 
-    println!("index: {}, base path: {}, name: {}, type: {}, size: {}, last modified: {}", 
+    println!("index: {:3}, base path: {}, name: {:25}, type: {:4}, symlink: {:5}, size: {}, last modified: {}", 
         filedirinfo.index, filedirinfo.base_path, filedirinfo.name, filedirinfo.file_dir_type,
-        filedirinfo.size_in_bytes, filedirinfo.last_modified_time);
+        filedirinfo.is_symlink, filedirinfo.size_in_bytes, filedirinfo.last_modified_time);
 
 }
 
@@ -65,7 +65,7 @@ pub fn display_folder_content(cmd_: Vec<&str>) -> u8{
         
         if folder_path[0] == "" { 
 
-            let files_and_directories = filesystem::get_list_of_files_and_directories(filesystem::get_path_seperator().to_string());
+            let files_and_directories = filesystem::get_list_of_files_and_directories(path_.to_string());
             for each in files_and_directories {
                 let filedirinfo: filesystem::FileDirInfo = each;
                 display_files_and_directories(&filedirinfo)
