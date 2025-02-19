@@ -44,7 +44,10 @@ pub fn get_list_of_files_and_directories(required_path: String) -> Vec<FileDirIn
     let mut file_dir_list_struct: Vec<FileDirInfo> = Vec::new();
     
     let base_path: String = required_path.clone();
-    let cur_dir = fs::read_dir(required_path).unwrap();
+    
+    let cur_dir_wrapped = fs::read_dir(required_path);
+    println!("{:?}", cur_dir_wrapped);
+    let cur_dir = cur_dir_wrapped.unwrap();
     
     let mut index: u16 = 0;
 

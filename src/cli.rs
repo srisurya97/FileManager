@@ -1,5 +1,7 @@
 use std::io;
 use std::io::Write;
+use std::path::Path;
+
 
 use crate::filesystem;
 use crate::errors;
@@ -41,54 +43,15 @@ pub fn change_directory(cmd_: Vec<&str>) -> u8{
 
 }
 
-pub fn display_folder_content(cmd_: Vec<&str>) -> u8{
+pub fn display_folder_content(path_to_display: String) -> u8{
     
-    let mut dir_path: String = String::new();
-
-    if (cmd_.len() == 1) || ( (cmd_.len() == 2) && (cmd_[1].trim() == ".".to_string()) )  {
-    
-        dir_path = filesystem::get_current_path();
-        let files_and_directories = filesystem::get_list_of_files_and_directories(dir_path);
+        let files_and_directories = filesystem::get_list_of_files_and_directories(path_to_display);
         for each in files_and_directories {
             let filedirinfo: filesystem::FileDirInfo = each;
             display_files_and_directories(&filedirinfo)
         }
 
         return errors::ERROR_SUCCESS;
-
-    } else {
-
-        let path_separator: &str = filesystem::get_path_seperator();
-        let path_ = cmd_[1]; 
-        let folder_path: Vec<&str> = path_.trim().split(path_separator).collect();
-        println!("{:?} {:?}", folder_path, path_);
-        
-        if folder_path[0] == "" { 
-
-            let files_and_directories = filesystem::get_list_of_files_and_directories(path_.to_string());
-            for each in files_and_directories {
-                let filedirinfo: filesystem::FileDirInfo = each;
-                display_files_and_directories(&filedirinfo)
-            }
-        
-        } else {
-
-            dir_path = filesystem::get_current_path();
-            let mut final_path: String = dir_path.clone();
-            final_path.push_str(path_separator);
-            final_path.push_str(path_);
-            println!("Path: {:?}", final_path);
-            let files_and_directories = filesystem::get_list_of_files_and_directories(final_path);
-            for each in files_and_directories {
-                let filedirinfo: filesystem::FileDirInfo = each;
-                display_files_and_directories(&filedirinfo)
-            }
-
-        }
-
-        return errors::ERROR_SUCCESS;
-
-    }
 
 }
 
@@ -131,7 +94,11 @@ pub fn process_cmd(cmd_to_process_: String) -> u8 {
 
     match cmd_to_process[0].trim().as_ref() {
         LS_CMD=>{
-            return display_folder_content(cmd_to_process);
+            if cmd_to_process.len() == 1{
+                return display_folder_content(".".to_string());
+            } else {
+                return display_folder_content(cmd_to_process[1].to_string());
+            }
         },
         CD_CMD=>{
             return change_directory(cmd_to_process);
