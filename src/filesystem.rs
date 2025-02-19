@@ -1,7 +1,8 @@
 use std::env;
 use std::fs;
+use std::path::Path;
+
 use std::time::UNIX_EPOCH;
-//use std::io::Write;
 use std::path::MAIN_SEPARATOR_STR;
 
 pub const TYPE_FILE:&str = "file";
@@ -44,9 +45,22 @@ pub fn get_list_of_files_and_directories(required_path: String) -> Vec<FileDirIn
     let mut file_dir_list_struct: Vec<FileDirInfo> = Vec::new();
     
     let base_path: String = required_path.clone();
+    if Path::new(required_path.as_str()).try_exists().unwrap() == false {
+        println!("Path Does not Exist");
+        return file_dir_list_struct; 
+    }
     
     let cur_dir_wrapped = fs::read_dir(required_path);
     println!("{:?}", cur_dir_wrapped);
+    
+    match cur_dir_wrapped {
+        Ok(_) => {},
+        Err(ref e) => {
+        
+            println!("Bad {}", e)
+        },
+    }
+
     let cur_dir = cur_dir_wrapped.unwrap();
     
     let mut index: u16 = 0;
